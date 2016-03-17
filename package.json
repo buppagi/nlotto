@@ -1,0 +1,25 @@
+{
+  "name": "로또",
+  "version": "0.0.1",
+  "description": "로또 통계자료",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": ""
+  },
+  "author": "modetour",
+  "license": "ISC",
+  "homepage": "",
+  "devDependencies": {
+    "gulp": "^3.9.0",
+    "gulp-autoprefixer": "^2.3.1",
+    "gulp-concat-css": "^2.2.0",
+    "gulp-csso": "^1.0.0"
+  },
+  "keywords": [
+    "로또"
+  ]
+}
