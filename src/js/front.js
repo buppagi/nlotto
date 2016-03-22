@@ -27,6 +27,10 @@
 			$total.append(item);
 		}
 		loadLotto();
+
+		$('.btn').on('click', function(){
+			sorting($(this).attr('id'));
+		});
 	};
 	var loadLotto = function(){
 		$.ajax({
@@ -36,6 +40,11 @@
 				var i, j, k, lotto = lottodata.lottos,
 					value, item;
 
+				/*var str ='';
+				 for(var name in data) {
+				 	star += '<li>' + data[name] + '</li>';
+				 }
+				 $(selector).html('<ul>'+ str + '</ul>');*/
 				item = '<table>';
 				item += '<caption>로또 회차별 당첨번호</caption>';
 				item += '<thead>',
@@ -48,10 +57,10 @@
 				item += '</thead>',
 				item += '<tbody>';
 				for(i=0;i<lotto.length;i++){
-					item +='<tr title="'+ lotto[i].num +'회차">',
+					item +='<tr>',
 					item += '<th scope="row">'+ lotto[i].num +'</th>';
 					for(j=1;j<46;j++) {
-						item +='<td>';
+						item +='<td title="'+ j +'번">';
 						for(var key in lotto[i].Data) {  // 6자리 맞는 숫자 찾아서 체크
 							value = lotto[i].Data[key];
 							if(j === value) {
@@ -115,6 +124,17 @@
 				}
 			});
 		}
+	};
+	// 정렬 버튼
+	var sorting = function(elem){
+		if( elem == 'sort' ) {
+
+		} else {
+
+		}
+	};
+	var selecBox = function() {
+
 	};
 	$(document).ready(function(){
 		init();
