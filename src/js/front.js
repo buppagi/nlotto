@@ -2,6 +2,7 @@
 	var $table = $('#lottoTable'),
 		$total = $('#lottoTotal');
 
+	// 초기화
 	var init = function(){
 		var item;
 		item = '<table>';
@@ -82,7 +83,9 @@
 		});
 	};
 	var total = function(){
-		var i, j, num, cnt, $td = $total.find('td'), arr = [];
+		var i, j, num, cnt,
+			$td = $total.find('td'),
+			arr = [];
 		
 		// 데이터 만들기
 		for(i=1;i<=$table.find('tbody > tr').length;i++){
@@ -124,6 +127,20 @@
 				}
 			});
 		}
+
+
+		/* // 버블정렬
+		for(i=0;i<5;i++) {
+			for(j=0;j<4;j++){
+				// 앞의 수, 바로 뒤의 수 비교해서
+				// 앞의 수가 클 경우 값을 교환
+				if(arr[j]>arr[j+1]) {
+					tmp=arr[j];
+					arr[j]=arr[j+1];
+					arr[j+1]=tmp;
+				}
+			}
+		}*/
 	};
 	// 정렬 버튼
 	var sorting = function(elem){

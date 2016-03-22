@@ -47,6 +47,48 @@ table{
 	padding-bottom:2em;
 }
 
+#btnWrap {
+	margin-bottom:5px;
+	text-align:right;
+}
+
+.btn {
+	display:inline-block;
+	padding:6px 12px;
+	font-weight:400;
+	@include font-size(14);
+	text-align:center;
+	white-space:nowrap;
+	vertical-align:middle;
+	cursor:pointer;
+	color:#333;
+	border:1px solid #ccc;
+	background-color:#fff;
+	border-radius:4px;
+	&:hover {
+		color:#333;
+		background-color:#e6e6e6;
+		border-color:#adadad;
+	}
+	&.curr {
+		color:#fff;
+		background-color:#5cb85c;
+		border-color:#4cae4c;
+		&:hover {
+			background-color:#449d44;
+			border-color:#398439;
+		}
+	}
+	&.active {
+		color:#fff;
+		background-color:#d9534f;
+		border-color:#d43f3a;
+		&:hover {
+			background-color:#c9302c;
+			border-color:#ac2925;
+		}
+	}
+}
 
 @media
 	only screen and (max-width: 760px),
@@ -58,13 +100,11 @@ table{
 		}
 
 		/* Hide table headers (but not display: none;, for accessibility) */
-		thead tr {
-			position: absolute;
-			top: -9999px;
-			left: -9999px;
-		}
+		
 
-		tr { border: 1px solid #ccc; }
+		tr { 
+			border: 1px solid #ccc;
+		}
 
 		td {
 			/* Behave  like a "row" */
@@ -72,18 +112,18 @@ table{
 			border-bottom: 1px solid #eee;
 			position: relative;
 			padding-left: 50%;
+			&:before {
+				/* Now like a table header */
+				position: absolute;
+				/* Top/left values mimic padding */
+				top: 6px;
+				left: 6px;
+				width: 45%;
+				padding-right: 10px;
+				white-space: nowrap;
+			}
 		}
 
-		td:before {
-			/* Now like a table header */
-			position: absolute;
-			/* Top/left values mimic padding */
-			top: 6px;
-			left: 6px;
-			width: 45%;
-			padding-right: 10px;
-			white-space: nowrap;
-		}
 	}
 
 	/* Smartphones (portrait and landscape) ----------- */
