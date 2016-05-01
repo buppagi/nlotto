@@ -1,11 +1,12 @@
 ;(function($){
 	var $table = $('#lottoTable'),
-		$total = $('#lottoTotal');
+		$total = $('#lottoTotal'),
+		$win = $(window);
 
 	// 초기화
 	var init = function(){
 		var item;
-		item = '<table>';
+		item = '<table class="responsive">';
 		item += '<caption>로또 통계 자료</caption>';
 		item += '<thead>',
 		item += '<tr>',
@@ -28,10 +29,13 @@
 			$total.append(item);
 		}
 		loadLotto();
-
+		
 		$('.btn').on('click', function(){
 			sorting($(this).attr('id'));
 		});
+	};
+	var bodyWidth = function() {
+		console.log($('table').outerWidth());
 	};
 	var loadLotto = function(){
 		$.ajax({
@@ -46,7 +50,7 @@
 				 	star += '<li>' + data[name] + '</li>';
 				 }
 				 $(selector).html('<ul>'+ str + '</ul>');*/
-				item = '<table>';
+				item = '<table class="responsive">';
 				item += '<caption>로또 회차별 당첨번호</caption>';
 				item += '<thead>',
 				item += '<tr>',
@@ -79,6 +83,7 @@
 			},
 			complete: function(){
 				total();
+				bodyWidth();
 			}
 		});
 	};
@@ -153,6 +158,7 @@
 	var selecBox = function() {
 
 	};
+
 	$(document).ready(function(){
 		init();
 	});
@@ -160,4 +166,3 @@
 
 // 6개의 숫자를 출력
 // 추후에 5번의 각기 다른 6개 숫자를  출력
-

@@ -1,10 +1,7 @@
-@charset "UTF-8";
+@charset "utf-8";
 @import 'mixins';
 @import 'reset';
 
-body { 
-	padding:2em;
-}
 table{ 
 	width:100%;
 	border-collapse:collapse;
@@ -25,8 +22,44 @@ table{
 		border-bottom-width:3px;
 		background-color:#c0c0c0;
 	}
+	tbody {
+		tr {
+			&:nth-child(even) {
+				th, td {
+					background-color:#f2f2f2;
+				}
+			}
+		}
+	}
 }
 
+
+@media screen and (max-width: 600px) {
+	table.table {
+		 thead { 
+			display: none;
+		}
+		tbody td { 
+			padding: .6rem; 
+			display: block;
+			&:first-child { 
+				background: #666; color: #fff; 
+			}
+			&:before { 
+				content: attr(data-th); 
+				font-weight: bold;
+				display: inline-block;
+				width: 6rem;  
+			}
+		}
+	}
+}
+
+#wrap {
+	width:100%;
+	box-sizing:border-box;
+	padding:2em;
+}
 #lottoTotal {
 	margin-bottom:10px;
 	td { 
@@ -90,55 +123,5 @@ table{
 	}
 }
 
-@media
-	only screen and (max-width: 760px),
-	(min-device-width: 768px) and (max-device-width: 1024px)  {
 
-		/* Force table to not be like tables anymore */
-		table, thead, tbody, th, td, tr {
-			display: block;
-		}
 
-		/* Hide table headers (but not display: none;, for accessibility) */
-		
-
-		tr { 
-			border: 1px solid #ccc;
-		}
-
-		td {
-			/* Behave  like a "row" */
-			border: none;
-			border-bottom: 1px solid #eee;
-			position: relative;
-			padding-left: 50%;
-			&:before {
-				/* Now like a table header */
-				position: absolute;
-				/* Top/left values mimic padding */
-				top: 6px;
-				left: 6px;
-				width: 45%;
-				padding-right: 10px;
-				white-space: nowrap;
-			}
-		}
-
-	}
-
-	/* Smartphones (portrait and landscape) ----------- */
-	@media only screen
-	and (min-device-width : 320px)
-	and (max-device-width : 480px) {
-		body {
-			padding: 0;
-			margin: 0;
-			width: 320px; }
-		}
-
-	/* iPads (portrait and landscape) ----------- */
-	@media only screen and (min-device-width: 768px) and (max-device-width: 1024px) {
-		body {
-			width: 495px;
-		}
-	}

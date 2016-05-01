@@ -6,23 +6,41 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta name="format-detection" content="telephone=no" />
 	<title>JSON을 이용한 로또번호 통계 자료 만들기</title>
-	<link rel="stylesheet" type="text/css" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.5.0/css/font-awesome.min.css" />
+	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.1/css/font-awesome.min.css" />
+	<link rel="stylesheet" type="text/css" href="./dist/css/responsive-tables.css" />
 	<link rel="stylesheet" type="text/css" href="./dist/css/style.min.css" />
+	<!--[if lt IE 9]>
+  		<link rel="stylesheet" href="./dist/css/ie.css" />
+  		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+	<![endif]-->
+	<style type="text/css">
+		.dezero { padding-top:1em; padding-left:4em; }
+		.dezero li { list-style-type:decimal-leading-zero; }
+	</style>
 </head>
 <body>
-	<div id="btnWrap">
-		<button class="btn active" id="output" type="button">뽑기</button> <button class="btn curr" id="sort" type="button">순서대로 정렬</button> <button class="btn" id="bigSort" type="button">잘 나온 순서대로 정렬</button>
+	<ol class="dezero" style="padding-left:4em;">
+		<li>기본은 번호 순서대로 정렬</li>
+		<li>최고 많이 나온 번호로 정렬</li>
+		<li>뽑기 버튼 누르면 최고 많이 나온 번호대로 정렬</li>
+		<li>제외 번호 넣기</li>
+		<li>조회 넣기</li>
+	</ol>
+	<div id="wrap">
+		<div id="btnWrap">
+			<button class="btn active" id="output" type="button">뽑기</button> <button class="btn curr" id="sort" type="button">순서대로 정렬</button> <button class="btn" id="bigSort" type="button">잘 나온 순서대로 정렬</button>
+		</div>
+		<!-- [시작]: 총 합계 -->
+		<div id="lottoTotal"></div>
+		<!-- [끝]: 총 합계   -->
+		
+		<!-- [시작]: 로또 데이터 -->
+		<div id="lottoTable"></div>
+		<!-- [끝]: 로또 데이터 -->
 	</div>
-	<!-- [시작]: 총 합계 -->
-	<div id="lottoTotal"></div>
-	<!-- [끝]: 총 합계   -->
 	
-	<!-- [시작]: 로또 데이터 -->
-	<div id="lottoTable"></div>
-	<!-- [끝]: 로또 데이터 -->
-	
-	<script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+	<script src="./dist/js/jquery-1.11.3.min.js"></script>
 	<script src="./dist/js/front.min.js"></script>
-	<!-- http://codepen.io/dudleystorey/pen/Geprd -->
+	<script src="./dist/js/responsive-tables.js"></script>
 </body>
 </html>
