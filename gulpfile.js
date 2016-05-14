@@ -31,7 +31,11 @@ var plumberOption = {
 // 웹서버를 localhost:8000로 실행한다.
 gulp.task('server', function(){
  	return gulp.src('./')
- 		.pipe(webserver());
+ 		.pipe(webserver({
+ 			port:9000,
+ 			livereload: true,
+ 			open:true
+ 		}));
 });
 gulp.task('js-front', function(){
  	return gulp.src('src/js/front.js')
