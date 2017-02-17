@@ -1,168 +1,217 @@
-;(function($){
-	var $table = $('#lottoTable'),
-		$total = $('#lottoTotal'),
-		$win = $(window);
+var $ = jQuery.noConflict();
+
+/*
+나눔로또 API
+// http://blog.kaisyu.com/2010/07/web-api.html
+// http://stackoverflow.com/questions/10089447/jquery-ajax-request-inside-ajax-request
+*/
+var isMobile = {
+	Android: function() {
+		return navigator.userAgent.match(/Android/i);
+	},
+	BlackBerry: function() {
+		return navigator.userAgent.match(/BlackBerry/i);
+	},
+	iOS: function() {
+		return navigator.userAgent.match(/iPhone|iPad|iPod/i);
+	},
+	Opera: function() {
+		return navigator.userAgent.match(/Opera Mini/i);
+	},
+	Windows: function() {
+		return navigator.userAgent.match(/IEMobile/i);
+	},
+	any: function() {
+		return (isMobile.Android() || isMobile.BlackBerry() || isMobile.iOS() || isMobile.Opera() || isMobile.Windows());
+	}
+};
+
+(function($){
+'use strict';
+	if (!$.concat)  {
+		$.extend({ 
+			concat: function() { 
+				return arguments.length ? Array.prototype.concat.apply([], arguments) : [];
+			 }
+		});
+	}
+
+	var $window = $(window),
+		$document = $(document),
+		$body = $('body'),
+		$wrap = $('#wrap'),
+		$table = $('#lottoTable'),
+		$winNum = $('#lottoWinNum'),
+		$dim = $('.dimmed'),
+		nlotto = nlotto || {};
 
 	// 초기화
-	var init = function(){
-		var item;
-		item = '<table class="responsive">';
-		item += '<caption>로또 통계 자료</caption>';
-		item += '<thead>',
-		item += '<tr>',
-		item += '<th scope="col">회차</th>';
-		for(var i=1;i<46;i++) {
-			item += '<th scope="col">'+ i +'</th>';
-		}
-		item += '</tr>',
-		item += '</thead>',
-		item +='<tbody>',
-		item +='<tr>',
-		item += '<th scope="row">합계</th>';
-		for(i=1;i<46;i++) {
-			item += '<td data-num="'+ i +'">0</td>';
-		}
-		item += '</tr>',
-		item += '</tbody>',
-		item += '</table>';
-		if($total.find('table').length == 0) {
-			$total.append(item);
-		}
-		loadLotto();
-		
-		$('.btn').on('click', function(){
-			sorting($(this).attr('id'));
-		});
-	};
-	var bodyWidth = function() {
-		console.log($('table').outerWidth());
-	};
-	var loadLotto = function(){
-		$.ajax({
-			url: 'dist/js/lottodata.json',
-			dataType: 'json',
-			success: function(lottodata){
-				var i, j, k, lotto = lottodata.lottos,
-					value, item;
+	nlotto = {
+		init:function() {
+			nlotto.settingTable(), nlotto.PopupLayer(), nlotto.keyUp(), nlotto.devNote(), nlotto.chkLotto();
+			nlotto.loadData();
+		},
+		settingTable:function(){
+			var item;
 
-				/*var str ='';
-				 for(var name in data) {
-				 	star += '<li>' + data[name] + '</li>';
-				 }
-				 $(selector).html('<ul>'+ str + '</ul>');*/
-				item = '<table class="responsive">';
-				item += '<caption>로또 회차별 당첨번호</caption>';
-				item += '<thead>',
-				item += '<tr>',
-				item += '<th scope="col">회차</th>';
-				for(j=1;j<46;j++) {
-					item += '<th scope="col">'+ j +'</th>';
+			item = '<table class="responsive lotto_tables">';
+			item += '<caption>로또 통계 자료</caption>';
+			item += '<thead>',
+			item += '<tr>',
+			item += '<th scope="col">회차</th>';
+			item += '<th scope="col">당첨번호</th>';
+			item += '<th scope="col">보너스 번호</th>';
+			item += '<th scope="col">날짜</th>';
+			item += '</tr>',
+			item += '</thead>',
+			item +='<tbody id="LuckyNumber">';
+			item += '</tbody>';
+			item += '</table>';
+			if($table.find('table').length == 0) {
+				$table.append(item);
+			}
+		},
+		TabsMenu:function(){
+			var $menu = $('.ui_tabs_menu'),
+				$contWrap = $('.ui_tabs_contents_wrap'),
+				_content ='.ui_tab_content',
+				curr = 'current';
+
+			if(!$menu.length ) { return }
+			$(_content).css('display', 'none');
+			$contWrap.each(function(){
+				$(this).find('div' + _content +':first').css('display', 'block');
+			});
+			$menu.on('click','a', function(){
+				if(!$(this).hasClass(curr)){
+					$(this).addClass(curr).closest('li').siblings('li').find('.' + curr).removeClass(curr);
+					$($(this).attr('href')).css('display', 'block').siblings('div'+_content).css('display', 'none');
 				}
-				item += '</tr>',
-				item += '</thead>',
-				item += '<tbody>';
-				for(i=0;i<lotto.length;i++){
-					item +='<tr>',
-					item += '<th scope="row">'+ lotto[i].num +'</th>';
-					for(j=1;j<46;j++) {
-						item +='<td title="'+ j +'번">';
-						for(var key in lotto[i].Data) {  // 6자리 맞는 숫자 찾아서 체크
-							value = lotto[i].Data[key];
-							if(j === value) {
-								item += '<i class="fa fa-check" data-num="'+ j +'"></i>';
+				this.blur();
+				return false;
+			});
+		},
+		// 레이어팝업 닫기
+		PopupLayer:function(){
+			$document.mousedown(function(e) {
+				$('.popup-layer').each(function() {
+					var _this = $(this);
+					if( _this.css('display') == 'block' ) {
+						var objPos = _this.offset();
+						objPos.right = (objPos.left + $(this).width());
+						objPos.bottom = (objPos.top + $(this).height());
+						if( e.pageX < objPos.left || e.pageX > objPos.right || e.pageY < objPos.top || e.pageY > objPos.bottom ) {
+							_this.css('display', 'none');
+							if($dim.length){
+								$dim.removeAttr('style');
 							}
 						}
-						
-						item += '</td>';
 					}
-					item += '</tr>';
-				}
-				item += '</tbody>',
-				item += '</table>';
-				$table.append(item);
-			},
-			complete: function(){
-				total();
-				bodyWidth();
-			}
-		});
-	};
-	var total = function(){
-		var i, j, num, cnt,
-			$td = $total.find('td'),
-			arr = [];
-		
-		// 데이터 만들기
-		for(i=1;i<=$table.find('tbody > tr').length;i++){
-			for( j=0; j<6; j++) {
-				num = parseInt($table.find('tr:eq('+ i +') td > i:eq('+j+') ').attr('data-num'));
-				cnt = $total.find('td[data-num='+ num +']').text();
-				cnt++;
-				$total.find('td[data-num='+ num +']').text(cnt);
-			}
-		}
-	
-		// 배열로 가져오기
-		for(var k=0; k<$td.length;k++) {
-			arr.push(parseInt($td.eq(k).text()));
-		}
+				});
+			});
+		},
+		devNote:function(){
+			$('.layerpop').on('click', function(e){
+				e.preventDefault();
+				var obj = $(this).attr('href');
+				$(obj).css('display', 'block');
+				var _h = $(obj).height(),
+					_w = $(obj).width();
 
-		// 중복 항목들 제거
-		var uniq = arr.slice() // 정렬하기 전에 복사본을 만든다.
-			.sort(function(a,b){
-				return a - b;
-			}).reduce(function(a,b){
-				if (a.slice(-1)[0] !== b) a.push(b); // slice(-1)[0] 을 통해 마지막 아이템을 가져온다.
-				return a;
-			},[]); //a가 시작될 때를 위한 비어있는 배열
-
-		// 큰 수부터 재 정렬
-		uniq = uniq.sort(function(a, b){return b-a}).slice(0, -1);
-		// console.log(uniq);
-		
-		var max = Math.max.apply(null, uniq); // 가장 많이 나온 숫자
-		for(var z=0;z<6;z++){
-			$td.each(function(){
-				var tmp = parseInt($(this).text());
-				if(tmp == uniq[z]) { // 6개의 숫자가 제일 많이 나온 색상 구분
-					$(this).addClass('key_num');
-				} 
-				if(tmp == max) { // 가장 나온 많이 나온 숫자 분류
-					$(this).addClass('maxium');
+				$(obj).css({
+					marginTop: -(_h/2) + 'px',
+					marginLeft: -(_w/2) + 'px'
+				});
+				$dim.css('display', 'block');
+			});
+		},
+		keyUp:function(){
+			$document.keyup(function(e){
+				// ESC키
+				if(e.keyCode == 27) {
+					$('.popup-layer').each(function() {
+						var _this = $(this);
+						if( _this.css('display') == 'block' ) {
+							_this.css('display', 'none');
+							if($dim.length){
+								$dim.removeAttr('style');
+							}
+						}
+					});
 				}
 			});
-		}
-
-
-		/* // 버블정렬
-		for(i=0;i<5;i++) {
-			for(j=0;j<4;j++){
-				// 앞의 수, 바로 뒤의 수 비교해서
-				// 앞의 수가 클 경우 값을 교환
-				if(arr[j]>arr[j+1]) {
-					tmp=arr[j];
-					arr[j]=arr[j+1];
-					arr[j+1]=tmp;
-				}
-			}
-		}*/
-	};
-	// 정렬 버튼
-	var sorting = function(elem){
-		if( elem == 'sort' ) {
-
-		} else {
+		},
+		loadData:function(){
+			var url = "https://spreadsheets.google.com/feeds/list/1IOYuPUjZH0ZPlMPy6eCPElR2o_FLraXLEgoEdlel_G4/od6/public/values?alt=json";
+			$.getJSON(url, function(data){
+				var entry = data.feed.entry;
+				$(entry).each(function(){
+					var item = '';
+					item += '<p>' + this.gsx$_cvlqs.$t + '</p>';
+					// item += '<h2>' + this.gsx$_cu76f.$t + '</h2>';
+					$table.append(item);
+				});
+			});
+		},
+		chkLotto:function(){
+			var item = '';
+		},
+		createTable:function(){
 
 		}
 	};
-	var selecBox = function() {
-
+	var twolength = function(n) {
+		return (n < 10 ? '0' : '') + n
 	};
+
+	var jRes = jRespond([
+		{
+			label: 'smallest',
+			enter: 0,
+			exit: 479
+		},{
+			label: 'handheld',
+			enter: 480,
+			exit: 767
+		},{
+				label: 'tablet',
+				enter: 768,
+			exit: 991
+		},{
+			label: 'laptop',
+			enter: 992,
+			exit: 1199
+		},{
+			label: 'desktop',
+			enter: 1200,
+			exit: 10000
+		}
+	]);
+	jRes.addFunc([
+		{
+			breakpoint: 'desktop',
+			enter: function() { $body.addClass('device-lg'); },
+			exit: function() { $body.removeClass('device-lg'); }
+		},{
+			breakpoint: 'laptop',
+			enter: function() { $body.addClass('device-md'); },
+			exit: function() { $body.removeClass('device-md'); }
+		},{
+			breakpoint: 'tablet',
+			enter: function() { $body.addClass('device-sm'); },
+			exit: function() { $body.removeClass('device-sm'); }
+		},{
+			breakpoint: 'handheld',
+			enter: function() { $body.addClass('device-xs'); },
+			exit: function() { $body.removeClass('device-xs'); }
+		},{
+			breakpoint: 'smallest',
+			enter: function() { $body.addClass('device-xxs'); },
+			exit: function() { $body.removeClass('device-xxs'); }
+		}
+	]);
 
 	$(document).ready(function(){
-		init();
+		nlotto.init();
 	});
 })(jQuery);
-
-// 6개의 숫자를 출력
-// 추후에 5번의 각기 다른 6개 숫자를  출력

@@ -11,10 +11,10 @@ html, body {
 html, body, div, form, input, select, button, textarea, legend, fieldset, h1, h2, h3, h4, h5, h6, ul, ol, dl, li, dt, dd, blockquote, address, p, th, td, caption {
 	margin:0;
 	padding:0;
-	font-family:'AppleGothic', "나눔고딕", 'NanumGothic', "맑은 고딕", 'MalgunGothic',dotum,"돋움",gulim,"굴림"
+	font-family:$basic-fonts;
 }
 body, input, textarea, select, button, table, a {
-	font-family:'AppleGothic', "나눔고딕", 'NanumGothic', "맑은 고딕", 'MalgunGothic',dotum,"돋움",gulim,"굴림"
+	font-family:$basic-fonts;
 }
 article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section, main {
   display: block;

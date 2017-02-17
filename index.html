@@ -1,11 +1,10 @@
-<!DOCTYPE html>
 <html lang="ko">
 <head>
 	<meta charset="UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<meta name="format-detection" content="telephone=no" />
-	<title>JSON을 이용한 로또번호 통계 자료 만들기</title>
+	<title>로또 당첨번호 조회 및 랜덤 뽑기</title>
 	<link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.1/css/font-awesome.min.css" />
 	<link rel="stylesheet" type="text/css" href="./dist/css/responsive-tables.css" />
 	<link rel="stylesheet" type="text/css" href="./dist/css/style.min.css" />
@@ -13,34 +12,84 @@
   		<link rel="stylesheet" href="./dist/css/ie.css" />
   		<script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
 	<![endif]-->
-	<style type="text/css">
-		.dezero { padding-top:1em; padding-left:4em; }
-		.dezero li { list-style-type:decimal-leading-zero; }
-	</style>
 </head>
 <body>
-	<ol class="dezero" style="padding-left:4em;">
-		<li>기본은 번호 순서대로 정렬</li>
-		<li>최고 많이 나온 번호로 정렬</li>
-		<li>뽑기 버튼 누르면 최고 많이 나온 번호대로 정렬</li>
-		<li>제외 번호 넣기</li>
-		<li>조회 넣기</li>
-	</ol>
 	<div id="wrap">
-		<div id="btnWrap">
-			<button class="btn active" id="output" type="button">뽑기</button> <button class="btn curr" id="sort" type="button">순서대로 정렬</button> <button class="btn" id="bigSort" type="button">잘 나온 순서대로 정렬</button>
-		</div>
-		<!-- [시작]: 총 합계 -->
-		<div id="lottoTotal"></div>
-		<!-- [끝]: 총 합계   -->
-		
-		<!-- [시작]: 로또 데이터 -->
-		<div id="lottoTable"></div>
-		<!-- [끝]: 로또 데이터 -->
+		<header>
+			<h1>로또 당첨번호 조회 및 랜덤 뽑기</h1>
+			<nav id="btnWrap">
+				<a class="curr" id="luckyNum" href="#lotchk" onclick="javascript:onClickCheck();">당첨번호 확인</a>
+				<a class="active" id="output" href="#">뽑기</a>
+				<a class="dev_note layerpop" href="#devNote">개발노트</a>
+			</nav>
+			<div class="layer-popup popup-layer" id="devNote">
+				<h2>Dev Note</h2>
+				<ol class="dezero">
+					<li>번호별로 당첨회수 뽑아 내기</li>
+					<li>회차로 당첨회수 체크</li>
+					<li>최고 많이 나온 번호로 정렬</li>
+					<li>뽑기 버튼 누르면 최고 많이 나온 번호대로 정렬</li>
+					<li>테이블 페이징 처리 (jPages 플러그인 이용 - http://luis-almeida.github.io/jPages/table.html)</li>
+				</ol>
+			</div>
+		</header>
+		<section>
+			<article>
+				<h2>최신 로또 번호</h2>
+				<div id="lottok"></div>
+				<div id="lottoWinNum"></div>
+				<div id="lottoTable"></div>
+				<div class="table_pager"></div>
+			</article>
+		</section>
+		<footer>
+			<div class="dimmed" id="dimmed"></div>
+			<div id="lotchk" class="popup-layer" tabindex="-1"></div>
+		</footer>
 	</div>
 	
 	<script src="./dist/js/jquery-1.11.3.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+	<script src="./dist/js/libs/plugins.min.js"></script>
 	<script src="./dist/js/front.min.js"></script>
-	<script src="./dist/js/responsive-tables.js"></script>
+	<script type="text/javascript">
+		function loadlot(a) {
+			lotpane = document.getElementById('lottok');
+			lotpane.innerHTML = '제 <span class="red"><b>' +
+			a.gno + '</b></span>회 (' + a.gdate + ')<br /><b><span class="green">' + 
+			a.nums + '</span> / <span class="blue">' + a.bnum + '</span></b>';
+		}
+	</script>
+	<script src="http://lotto.kaisyu.com/api?method=get&callback=loadlot"></script>
+	<script type="text/javascript">
+		function onClickCheck() {
+			v = prompt("숫자와 콤마입력: ", "1,2,3,4,5,6");
+			var scrpt = document.createElement('script');
+			scrpt.type = 'text/javascript'; 
+			scrpt.src = 'http://lotto.kaisyu.com/api' +
+			'?method=check&callback=lot_check_result&numlist=[[' +
+			encodeURI(v) + ']]';
+			if(v === null) {
+				return;
+			} else {
+				document.getElementsByTagName('head')[0].appendChild(scrpt);
+				var lotpane = document.getElementById('lotchk');
+				lotpane.style.display = 'block';
+				var height = lotpane.clientHeight;
+				var width = lotpane.clientWidth;
+				lotpane.style.marginTop = -(height/2) + 'px';
+				lotpane.style.marginLeft = -(width/2) + 'px';
+				lotpane.focus();
+				document.getElementById('dimmed').style.display = 'block';
+			}
+		}
+		function lot_check_result(a) {
+			lotpane = document.getElementById('lotchk');
+			gr = a[0][0] == 0 ? "꽝" : a[0][0];
+			mtch = a[0][1];
+			lotpane.innerHTML = '등수: <span class="green"><b>' + gr +
+			'</b></span><br/>일치 번호: <span class="red"><b>' + mtch + '</b></span>';
+		}
+	</script>
 </body>
 </html>
