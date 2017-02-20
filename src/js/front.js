@@ -145,9 +145,11 @@ var isMobile = {
 			var url = "https://spreadsheets.google.com/feeds/list/1IOYuPUjZH0ZPlMPy6eCPElR2o_FLraXLEgoEdlel_G4/od6/public/values?alt=json";
 			$.getJSON(url, function(data){
 				var entry = data.feed.entry;
-				$(entry).each(function(){
+				$(entry).each(function(i){
+					// console.log( $(this).eq(i) );
+					console.log( this );
 					var item = '';
-					item += '<p>' + this.gsx$_cvlqs.$t + '</p>';
+					// item += '<p>' + this.gsx$_cvlqs.$t + '</p>';
 					// item += '<h2>' + this.gsx$_cu76f.$t + '</h2>';
 					$table.append(item);
 				});
